@@ -69,7 +69,7 @@ func mkArr(n int, value int) []int {
 	return res
 }
 
-func (s *sqrt) add(i int, val int) {
+func (s *sqrt) set(i int, val int) {
 	s.arr[i] = s.agg(s.arr[i], val)
 	s.sqrt[i/s.ns] = s.agg(s.sqrt[i/s.ns], val)
 }
