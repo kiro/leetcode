@@ -1,6 +1,9 @@
 package leetcode
 
-import "container/heap"
+import (
+	"container/heap"
+	"fmt"
+)
 
 type value int
 
@@ -8,6 +11,10 @@ type Item struct {
 	v value
 	p int
 	i int
+}
+
+func (i *Item) String() string {
+	return fmt.Sprintf("(v:%v p:%v i:%v)", i.v, i.p, i.i)
 }
 
 func item(v value, p int) *Item {
@@ -23,8 +30,9 @@ func Max(l, r *Item) bool {
 }
 
 type Heap struct {
-	p     *pq
-	items map[value][]*Item
+	p               *pq
+	items           map[value]*Item
+	DisableIndexing bool
 }
 
 func NewHeap(compare func(l, r *Item) bool) *Heap {
@@ -33,7 +41,8 @@ func NewHeap(compare func(l, r *Item) bool) *Heap {
 			[]*Item{},
 			compare,
 		},
-		make(map[value][]*Item),
+		make(map[value]*Item),
+		false,
 	}
 }
 
@@ -72,22 +81,20 @@ func (h *Heap) Remove(item *Item) {
 	heap.Remove(h.p, item.i)
 }
 
-func (h *Heap) Get(v value) []*Item {
+func (h *Heap) Get(v value) *Item {
 	return h.items[v]
 }
 
-func (h *Heap) removeItem(res *Item) {
-	x := h.items[res.v]
-	for i, it := range x {
-		if it == res {
-			h.items[res.v] = append(x[:i], x[i+1:]...)
-			break
-		}
+func (h *Heap) removeItem(item *Item) {
+	if !h.DisableIndexing {
+		delete(h.items, item.v)
 	}
 }
 
 func (h *Heap) addItem(item *Item) {
-	h.items[item.v] = append(h.items[item.v], item)
+	if !h.DisableIndexing {
+		h.items[item.v] = item
+	}
 }
 
 // A PriorityQueue implements heap.Interface and holds Items.
