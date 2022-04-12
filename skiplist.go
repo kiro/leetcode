@@ -2,7 +2,7 @@ package leetcode
 
 import (
 	"fmt"
-	"math"
+	"math/bits"
 	"math/rand"
 	"time"
 )
@@ -65,11 +65,14 @@ type skiplist struct {
 }
 
 func (s *skiplist) nodeDepth() int {
-	x := MAX_DEPTH - int(math.Log2(s.r.Float64()*(1<<MAX_DEPTH)))
-	if x > MAX_DEPTH {
-		return MAX_DEPTH
+	level := MAX_DEPTH - 1
+	var x = rand.Uint64() & ((1 << uint(MAX_DEPTH-1)) - 1)
+	zeroes := bits.TrailingZeros64(x)
+	if zeroes <= MAX_DEPTH {
+		level = zeroes
 	}
-	return x
+
+	return level
 }
 
 func (s *skiplist) compare(node *node, key interface{}) int {
@@ -99,7 +102,6 @@ func (s *skiplist) path(key interface{}, depth int) []*node {
 
 func (s *skiplist) Add(key interface{}, value interface{}) {
 	depth := s.nodeDepth()
-	//fmt.Println(depth)
 	node := newNode(depth, key, value)
 
 	p := s.path(key, MAX_DEPTH)
