@@ -2,7 +2,7 @@ package leetcode
 
 import "math"
 
-type IndexTree struct {
+type indexTree struct {
 	n            int
 	arr          []int
 	f            func(i, j int) int
@@ -14,8 +14,6 @@ type Aggregation interface {
 	Aggregate(left, right int) int
 }
 
-type MinIndex struct{}
-
 func (m MinIndex) DefaultValue() int { return math.MaxInt32 }
 func (m MinIndex) Aggregate(left, right int) int {
 	if left < right {
@@ -24,8 +22,6 @@ func (m MinIndex) Aggregate(left, right int) int {
 		return right
 	}
 }
-
-type MaxIndex struct{}
 
 func (m MaxIndex) DefaultValue() int { return math.MinInt32 }
 func (m MaxIndex) Aggregate(left, right int) int {
@@ -36,21 +32,10 @@ func (m MaxIndex) Aggregate(left, right int) int {
 	}
 }
 
-type SumIndex struct{}
-
 func (m SumIndex) DefaultValue() int             { return 0 }
 func (m SumIndex) Aggregate(left, right int) int { return left + right }
 
-func NewIndexTree(n int, a Aggregation) *IndexTree {
-	arr := make([]int, n*4)
-	for i := 0; i < len(arr); i++ {
-		arr[i] = a.DefaultValue()
-	}
-
-	return &IndexTree{n, arr, a.Aggregate, a.DefaultValue()}
-}
-
-func (i *IndexTree) Add(k, v int) {
+func (i *indexTree) Add(k, v int) {
 	i.traverse(1, 0, i.n, func(node, b, e int) bool {
 		if b <= k && e >= k {
 			i.arr[node] = i.f(i.arr[node], v)
@@ -60,7 +45,7 @@ func (i *IndexTree) Add(k, v int) {
 	})
 }
 
-func (i *IndexTree) Get(qb, qe int) int {
+func (i *indexTree) Get(qb, qe int) int {
 	res := i.defaultValue
 	i.traverse(1, 0, i.n, func(node, b, e int) bool {
 		if b >= qb && e <= qe {
@@ -72,7 +57,7 @@ func (i *IndexTree) Get(qb, qe int) int {
 	return res
 }
 
-func (i *IndexTree) traverse(node int, b, e int, do func(node, b, e int) bool) {
+func (i *indexTree) traverse(node int, b, e int, do func(node, b, e int) bool) {
 	if !do(node, b, e) {
 		return
 	}
@@ -81,4 +66,25 @@ func (i *IndexTree) traverse(node int, b, e int, do func(node, b, e int) bool) {
 		i.traverse(node*2, b, m, do)
 		i.traverse(node*2+1, m+1, e, do)
 	}
+}
+
+// Aggregation types
+type MinIndex struct{}
+type MaxIndex struct{}
+type SumIndex struct{}
+
+type IndexTree interface {
+	// Adds v to index i
+	Add(i, v int)
+	// Gets the aggregation in the interval [b, e]
+	Get(b, e int) int
+}
+
+func NewIndexTree(n int, a Aggregation) IndexTree {
+	arr := make([]int, n*4)
+	for i := 0; i < len(arr); i++ {
+		arr[i] = a.DefaultValue()
+	}
+
+	return &indexTree{n, arr, a.Aggregate, a.DefaultValue()}
 }
