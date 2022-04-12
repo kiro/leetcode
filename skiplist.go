@@ -62,6 +62,7 @@ type skiplist struct {
 	r    *rand.Rand
 	root *node
 	end  *node
+	len  int
 }
 
 func (s *skiplist) nodeDepth() int {
@@ -101,6 +102,7 @@ func (s *skiplist) path(key interface{}, depth int) []*node {
 }
 
 func (s *skiplist) Add(key interface{}, value interface{}) {
+	s.len++
 	depth := s.nodeDepth()
 	node := newNode(depth, key, value)
 
@@ -137,6 +139,8 @@ func (s *skiplist) Remove(key interface{}) bool {
 	if s.compare(path[0], key) != 0 {
 		return false
 	}
+
+	s.len--
 
 	node := path[0]
 
@@ -217,6 +221,10 @@ func (s *skiplist) Last() Node {
 	return s.end.Prev()
 }
 
+func (s *skiplist) Len() int {
+	return s.len
+}
+
 func (i IntComparator) Compare(l, r interface{}) int {
 	left := l.(int)
 	right := r.(int)
@@ -244,6 +252,7 @@ func NewSkiplist(c Comparator) Skiplist {
 		rand.New(rand.NewSource(time.Now().UnixNano())),
 		start,
 		end,
+		0,
 	}
 }
 
@@ -272,5 +281,6 @@ type Skiplist interface {
 	GetAt(i int) Node
 	First() Node
 	Last() Node
+	Len() int
 	String() string
 }
