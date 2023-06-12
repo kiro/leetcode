@@ -54,6 +54,8 @@ func (i *indexTree) Add(k, v int) IndexTree {
 	return &indexTree{i.n, newRoot, i.f, i.defaultValue}
 }
 
+var some = &node{0, nil, nil}
+
 func (i *indexTree) Get(qb, qe int) int {
 	res := i.defaultValue
 	i.traverse(i.root, 0, i.n, false, func(cur *node, b, e int) *node {
@@ -62,7 +64,7 @@ func (i *indexTree) Get(qb, qe int) int {
 			return nil
 		}
 		if !(qe < b || qb > e) {
-			return &node{0, nil, nil}
+			return some
 		} else {
 			return nil
 		}
@@ -77,15 +79,17 @@ func (i *indexTree) traverse(cur *node, b, e int, add bool, do func(node *node, 
 		return cur
 	}
 
-	if cur.left == nil {
-		cur.left = &node{i.defaultValue, nil, nil}
-	}
-	if cur.right == nil {
-		cur.right = &node{i.defaultValue, nil, nil}
-	}
+	if add {
+		if cur.left == nil {
+			cur.left = &node{i.defaultValue, nil, nil}
+		}
+		if cur.right == nil {
+			cur.right = &node{i.defaultValue, nil, nil}
+		}
 
-	x.left = cur.left
-	x.right = cur.right
+		x.left = cur.left
+		x.right = cur.right
+	}
 
 	m := (b + e) / 2
 
