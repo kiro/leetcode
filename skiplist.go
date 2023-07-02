@@ -225,6 +225,11 @@ func (s *skiplist) Len() int {
 	return s.len
 }
 
+func (s *skiplist) Has(key interface{}) bool {
+	node := s.Get(key)
+	return node != nil && node.Key() == key
+}
+
 func (i IntComparator) Compare(l, r interface{}) int {
 	left := l.(int)
 	right := r.(int)
@@ -275,6 +280,7 @@ type Node interface {
 type Skiplist interface {
 	Add(k interface{}, v interface{})
 	Remove(k interface{}) bool
+	Has(k interface{}) bool
 	// Get the node if key is present, or the node after which Key will be inserted
 	Get(k interface{}) Node
 	// Gets the node at zero based index i in the sorted order.
