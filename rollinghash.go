@@ -1,29 +1,31 @@
 package leetcode
 
 type substr struct {
-	hash int
+	hash int64
 	i, j int
 	str  string
 }
 
+const modulo int64  =  288230376151711615 // 1152921504606846975 //9223372036854775837
+
 func hash(s string, n int) []substr {
 	res := make([]substr, 0)
-	m := 1000000007
-	p := 7
+    var m int64 = modulo
+    p := int64(7)
 
-	mp := 1
+    mp := int64(1)
 	for i := 0; i < n; i++ {
 		mp = (mp * p) % m
 	}
 
-	hash := 0
+    hash := int64(0)
 	for i := 0; i < len(s); i++ {
-		hash = (hash*p + int(s[i])) % m
+		hash = (hash*p + int64(s[i])) % m
 		if i >= n {
-			hash = (hash - int(s[i-n])*mp) % m
-			if hash < 0 {
-				hash += m
-			}
+			hash = (hash - int64(s[i-n])*mp) % m
+		}
+		if hash < 0 {
+			hash += m
 		}
 
 		if i >= n-1 {
@@ -37,20 +39,4 @@ func hash(s string, n int) []substr {
 	}
 
 	return res
-}
-
-func repeated(s string, n int) string {
-	h := make(map[int][]string)
-
-	for _, sub := range hash(s, n) {
-		for _, v := range h[sub.hash] {
-			if v == sub.str {
-				return v
-			}
-		}
-
-		h[sub.hash] = append(h[sub.hash], sub.str)
-	}
-
-	return ""
 }
