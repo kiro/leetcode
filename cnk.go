@@ -1,14 +1,16 @@
 package leetcode
 
 type cnk struct {
-	mod int
-	f   []int
+	mod  int
+	f    []int
+	invc map[int]int
 }
 
 func NewCnk(mod int) *cnk {
 	return &cnk{
 		mod,
 		[]int{1},
+		make(map[int]int),
 	}
 }
 
@@ -43,7 +45,13 @@ func (c *cnk) fact(n int) int {
 }
 
 func (c *cnk) inv(n int) int {
-	return c.pow(c.fact(n), c.mod-2)
+	if v, ok := c.invc[n]; !ok { 
+		res := c.pow(c.fact(n), c.mod-2)
+		c.invc[n] = res
+		return res
+	} else {
+		return v
+	}
 }
 
 func (c *cnk) Calc(n int, k int) int {
